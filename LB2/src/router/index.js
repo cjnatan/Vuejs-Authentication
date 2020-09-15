@@ -36,30 +36,28 @@ const routes = [
 const router = new VueRouter({routes,mode:'history'})  
 
 router.beforeEach((to, from, next) => {
-  if(to.meta.requiresAuth) {
-    const authUser = JSON.parse(window.localStorage.getItem('lbUser'))
-    if(!authUser || !authUser.token) {
-      next({name:'login'})
+    if (to.meta.requiresAuth) {
+        const authUser = JSON.parse(window.localStorage.getItem('lbUser'))
+        if (!authUser || !authUser.token) {
+            next({ name: 'login' })
+        }
+        else if (to.meta.adminAuth) {
+            if (authUser.data.role_id === 'ADMIN') {
+                next()
+            } else {
+                next('/resident')
+            }
+        } else if (to.meta.residentAuth) {
+            if (authUser.data.role_id === 'RESIDENT') {
+                next()
+            } else {
+                console.log('Im in admin')
+                next('/admin')
+            }
+        }
+    } else {
+        next()
     }
-    else if(to.meta.adminAuth) {
-    const authUser = JSON.parse(window.localStorage.getItem('lbUser'))
-    if(authUser.data.role_id === 'ADMIN') {
-      next()
-    }else {
-      next('/resident')
-    }
-  } else if(to.meta.residentAuth) {
-    const authUser = JSON.parse(window.localStorage.getItem('lbUser'))
-    if(authUser.data.role_id === 'RESIDENT') {
-      next()
-    }else {
-      console.log('Im in admin')
-      next('/admin')
-    }
-  }
-  }else {
-  next()
-  }
 })
 
 
